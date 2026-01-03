@@ -44,13 +44,15 @@ minikube addons enable metrics-server
 kubectl apply -f k8/pv.yaml
 kubectl apply -f k8/pvc.yaml
 
-3. Deploy Infrastructure:
+2. Deploy Infrastructure:
 
 kubectl apply -f k8/configmap.yaml
 kubectl apply -f k8/deployment.yaml
 kubectl apply -f k8/service.yaml
 kubectl apply -f k8/hpa.yaml
 kubectl apply -f k8/cronjob.yaml
+
+----------------------------------------------------------------------------
 
 📈 Feature Comparison:
 Feature			  Docker Compose (Local)				      Kubernetes (Production)
@@ -65,6 +67,8 @@ The application is coded to look for access_log.txt in /storage.
 - In Docker Compose, this is a direct bind-mount to your project folder.
 - In Kubernetes, this is a Persistent Volume Claim mapped to the same host path. 
 This ensures that whether you are developing locally or running in a cluster, your logs are always preserved and centralized.
+
+----------------------------------------------------------------------------
 
 📊 Operations & Testing (K8s)
 Access the Application:
@@ -83,6 +87,7 @@ Monitor the status in a separate window:
 
 kubectl get hpa flask-k8-app-hpa -w
 
+----------------------------------------------------------------------------
 
 Monitoring Health Checks
 The flask-health-pinger CronJob runs every minute. 
