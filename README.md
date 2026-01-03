@@ -41,12 +41,15 @@ You will see logs appearing immediately as you browse.
 For high availability and autoscaling, deploy the manifests located in the k8/ directory.
 
 1. Initialize Cluster & Storage
+
 Bash
 
 minikube addons enable metrics-server
 kubectl apply -f k8/pv.yaml
 kubectl apply -f k8/pvc.yaml
-2. Deploy Infrastructure
+
+3. Deploy Infrastructure
+
 Bash
 
 kubectl apply -f k8/configmap.yaml
@@ -56,36 +59,46 @@ kubectl apply -f k8/hpa.yaml
 kubectl apply -f k8/cronjob.yaml
 
 📈 Feature Comparison:
-Feature	Docker Compose (Local)	Kubernetes (Production)
-Scaling	Manual (docker-compose up --scale)	Automatic via HPA
-Persistence	Host Bind Mount	Persistent Volume (PV/PVC)
-Health Check	Manual/Docker healthcheck	CronJob Pinger & Probes
-Traffic	Simple Port Mapping	Load Balancer (Service)
+Feature			Docker Compose (Local)				Kubernetes (Production)
+Scaling			Manual (docker-compose up --scale)	Automatic via HPA
+Persistence		Host Bind Mount						Persistent Volume (PV/PVC)
+Health Check	Manual/Docker healthcheck			CronJob Pinger & Probes
+Traffic			Simple Port Mapping					Load Balancer (Service)
+
+📝 Key Components Explained
+The /storage Strategy
+The application is coded to look for access_log.txt in /storage.
+- In Docker Compose, this is a direct bind-mount to your project folder.
+- In Kubernetes, this is a Persistent Volume Claim mapped to the same host path. 
+This ensures that whether you are developing locally or running in a cluster, your logs are always preserved and centralized.
+
+📊 Operations & Testing (K8s)
+Access the Application
+Bash
+
+minikube service flask-k8-app-service --url
+Home (/): Displays content from data.txt.
+Logs (/log): Displays real-time access logs.
+
+Testing the Autoscaler
+To simulate high traffic and watch the HPA scale the deployment from 2 to 5 or more replicas, run:
+
+Bash
+
+kubectl run load-generator --rm -it --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://flask-k8-app-service:5000; done"
+
+Monitor the status in a separate window
+Bash
+
+kubectl get hpa flask-k8-app-hpa -w
 
 
+Monitoring Health Checks
+The flask-health-pinger CronJob runs every minute. 
+It pings the /health endpoint and appends the HTTP status code to /storage/access_log.txt. 
+You can view these entries directly on the /log page of the web app.
 
-
-📈 Feature Comparison
-Feature		Docker Compose (Local)Kubernetes (Production)ScalingManual (docker-compose up --scale)Automatic via HPAPersistenceHost Bind MountPersistent Volume (PV/PVC)Health CheckManual/Docker healthcheckCronJob Pinger & ProbesTrafficSimple Port MappingLoad Balancer (Service)
-
-
-
-# To run it as stand alone docker container:
-Prerequisites:
-    Docker installed on your machine.
-
-	Docker Compose (included with Docker Desktop).
-
-Running the App:
-
-1 -The docker-compose file will download the image from Docker hub, but if you want to download the image manually, 
-please run: docker pull ap88/flask-k8-app:005
-
-2 - unzip the attached folder and navigate into it, 
-And run the docker-compose.yaml file with the following command: docker-compose up -d
-
-3 - Access the application: Open your browser and navigate to http://localhost:5000
-
-# To run it as K8s cluster
-:
+Cleanup
+- Docker: docker-compose down
+- Kubernetes: kubectl delete -f k8/
 
