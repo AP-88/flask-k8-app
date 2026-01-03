@@ -25,8 +25,6 @@ If you want to run the application without Kubernetes, use the Docker Compose se
 This mimics the persistent storage behavior by mounting your local ./storage folder into the container.
 
 Run the App:
-Bash
-
 docker-compose up -d
 
 What happens: Docker builds the image and mounts the local /storage directory to the container's /storage path.
@@ -40,17 +38,13 @@ You will see logs appearing immediately as you browse.
 ☸️ Option 2: Production Deployment (Kubernetes)
 For high availability and autoscaling, deploy the manifests located in the k8/ directory.
 
-1. Initialize Cluster & Storage
-
-Bash
+1. Initialize Cluster & Storage:
 
 minikube addons enable metrics-server
 kubectl apply -f k8/pv.yaml
 kubectl apply -f k8/pvc.yaml
 
-3. Deploy Infrastructure
-
-Bash
+3. Deploy Infrastructure:
 
 kubectl apply -f k8/configmap.yaml
 kubectl apply -f k8/deployment.yaml
@@ -59,11 +53,11 @@ kubectl apply -f k8/hpa.yaml
 kubectl apply -f k8/cronjob.yaml
 
 📈 Feature Comparison:
-Feature			Docker Compose (Local)				Kubernetes (Production)
-Scaling			Manual (docker-compose up --scale)	Automatic via HPA
-Persistence		Host Bind Mount						Persistent Volume (PV/PVC)
-Health Check	Manual/Docker healthcheck			CronJob Pinger & Probes
-Traffic			Simple Port Mapping					Load Balancer (Service)
+Feature			  Docker Compose (Local)				      Kubernetes (Production)
+Scaling			  Manual (docker-compose up --scale)	Automatic via HPA
+Persistence		Host Bind Mount						          Persistent Volume (PV/PVC)
+Health Check	Manual/Docker healthcheck			      CronJob Pinger & Probes
+Traffic			  Simple Port Mapping					        Load Balancer (Service)
 
 📝 Key Components Explained
 The /storage Strategy
@@ -73,22 +67,19 @@ The application is coded to look for access_log.txt in /storage.
 This ensures that whether you are developing locally or running in a cluster, your logs are always preserved and centralized.
 
 📊 Operations & Testing (K8s)
-Access the Application
-Bash
+Access the Application:
 
 minikube service flask-k8-app-service --url
+
 Home (/): Displays content from data.txt.
 Logs (/log): Displays real-time access logs.
 
 Testing the Autoscaler
 To simulate high traffic and watch the HPA scale the deployment from 2 to 5 or more replicas, run:
 
-Bash
-
 kubectl run load-generator --rm -it --image=busybox:1.28 --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://flask-k8-app-service:5000; done"
 
-Monitor the status in a separate window
-Bash
+Monitor the status in a separate window:
 
 kubectl get hpa flask-k8-app-hpa -w
 
