@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ap88/python-flask</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+        }
+
+        /* The New Big Title */
+        .main-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-header h1 {
+            font-size: 3rem;
+            color: #1a202c;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .main-header p {
+            color: #718096;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        /* The List Container */
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Styled List */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            padding: 15px;
+            border-bottom: 1px solid #edf2f7;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        li:hover {
+            background-color: #f8fafc;
+            border-radius: 8px;
+            color: #3182ce;
+            cursor: default;
+        }
+
+        /* Bullet point replacement */
+        li::before {
+            content: "•";
+            color: #cbd5e0;
+            font-weight: bold;
+            display: inline-block; 
+            width: 1em;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <h1>{{ title }}</h1>
+	<a href="/log">Logs</a>
+    </header>
+
+    <div class="card">
+        <h2>List from text file:</h2>
+        <ul>
+			{% for item in data %}
+				<li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>

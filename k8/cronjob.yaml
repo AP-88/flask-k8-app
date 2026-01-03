@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: flask-health-pinger
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid      # Don't start a new pod if the old one is still there
+  successfulJobsHistoryLimit: 1  # Moved up here
+  failedJobsHistoryLimit: 1      # Moved up here
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          spec:
+          # This helps avoid volume lock issues by using the same user as the app
+          securityContext:
+            runAsUser: 0
+          containers:
+          - name: pinger
+            image: curlimages/curl:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # The -f flag makes curl fail with an error code if status is 404/500
+              status=$(curl -f -s -o /dev/null -w "%{http_code}" http://flask-k8-app-service:5000/health)
+              echo "[$(date)] CRON CHECK: Status $status" >> /storage/access_log.txt
+            volumeMounts:
+            - name: storage
+              mountPath: /storage
+          restartPolicy: Never
+          volumes:
+          - name: storage
+            persistentVolumeClaim:
+              claimName: flask-k8-app-pvc

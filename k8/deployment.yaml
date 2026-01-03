@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-k8-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flask-k8-app
+  template:
+    metadata:
+      labels:
+        app: flask-k8-app
+    spec:
+      containers:
+      - name: flask-k8-app-container
+        image: ap88/flask-k8-app:005
+        ports:
+        - containerPort: 5000
+      
+        # --- Liveness and Readiness ---
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5      
+        # ------------------------------
+
+
+        # Mandatory for HPA: Defines the "100%" baseline for CPU scaling
+        resources:
+          requests:
+            cpu: "100m"      # Reserved for the pod (0.1 CPU core)
+            memory: "128Mi"
+          limits:
+            cpu: "500m"      # Hard ceiling for the pod
+            memory: "256Mi"
+          # ------------------------------------------------------------
+
+        envFrom:
+        - configMapRef:
+            name: flask-k8-app-config
+
+        volumeMounts:
+        - name: storage
+          mountPath: /storage
+
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: flask-k8-app-pvc

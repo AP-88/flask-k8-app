@@ -1,0 +1,10 @@
+# To add load to the app I used:
+
+kubectl run load-generator-1 --image=busybox:1.28 -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://flask-k8-app-service:5000; done"
+
+# and if needed another load-genrator:
+
+kubectl run load-generator-2 --image=busybox:1.28 -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://flask-k8-app-service:5000; done"
+
+# to kill both:
+kubectl delete pod load-generator-1 load-generator-2
